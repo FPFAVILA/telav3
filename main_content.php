@@ -1124,7 +1124,7 @@ body {
     </div>
 
     <?php if ($promo_enabled): ?>
-    <div class="price-bar-red urgency-element">
+    <div class="price-bar-red anim-in">
         <div class="tt-price-left">
             <?php if ($desconto_percentual > 0): ?>
             <span class="tt-discount-badge">-<?php echo htmlspecialchars($desconto_percentual); ?>%</span>
@@ -1144,7 +1144,7 @@ body {
         </div>
     </div>
     <?php if ($coupon_enabled): ?>
-    <div class="promo-coupon-card urgency-element" id="promoCouponCard" style="display:none;">
+    <div class="promo-coupon-card anim-in" id="promoCouponCard" style="display:none;">
         <div class="promo-coupon-copy">
             <strong><?php echo htmlspecialchars($promo_config['coupon_label']); ?></strong>
             <span>R$ <?php echo number_format($coupon_amount, 2, ',', '.'); ?> de desconto aplicado</span>
@@ -1207,7 +1207,7 @@ body {
     </div>
     <?php endif; ?>
 
-    <div class="coupon-bar urgency-element">
+    <div class="coupon-bar anim-in">
         <div class="info-icon-left">
             <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
                 <path d="M4 4.85v.9h1v-.9zm7 0v.9h1v-.9zm-7 1.8v.9h1v-.9zm7 0v.9h1v-.9zm-7 1.8v.9h1v-.9zm7 0v.9h1v-.9zm-7 1.8v.9h1v-.9zm7 0v.9h1v-.9z"/>

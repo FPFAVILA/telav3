@@ -1,7 +1,8 @@
 <?php
-// Ficheiro: db_config.php
-// Objetivo: Conectar ao banco de dados usando DATABASE_URL (para produção)
-//           ou credenciais locais (para desenvolvimento) e inicializar o DB (Plug and Play).
+if (!defined('INCLUDED_BY_INDEX') && !defined('INCLUDED_BY_RENDER') && basename($_SERVER['SCRIPT_NAME'] ?? '') === 'db_config.php') {
+    http_response_code(404);
+    exit;
+}
 
 $pdo = null;
 
@@ -21,7 +22,8 @@ if (getenv('DATABASE_URL')) {
     $url_components = parse_url($db_url);
 
     if ($url_components === false || !isset($url_components['path'])) {
-        die("Erro: DATABASE_URL inválida ou ausente no ambiente de produção.");
+        http_response_code(500);
+        exit;
     }
 
     $host = $url_components['host'];
@@ -64,8 +66,9 @@ try {
     initializeDatabase($pdo);
 
 } catch (PDOException $e) {
-    // Se a conexão falhar, o script para.
-    die("Erro ao conectar ao banco de dados: " . $e->getMessage());
+    error_log("DB connection error: " . $e->getMessage());
+    http_response_code(500);
+    exit;
 }
 
 /**
@@ -79,10 +82,8 @@ function initializeDatabase(PDO $pdo) {
     $table_exists = $stmt->fetchColumn() !== null;
 
     if (!$table_exists) {
-        if (php_sapi_name() !== 'cli') {
-            echo "Banco de dados vazio detectado. Criando tabelas e inserindo dados iniciais...<br>";
-        } else {
-            echo "Banco de dados vazio detectado. Criando tabelas e inserindo dados iniciais...\n";
+        if (php_sapi_name() === 'cli') {
+            error_log("Initializing database tables...");
         }
 
         // --------------------------------------------------------------------------------------
@@ -238,13 +239,13 @@ SQL;
         // Executa o SQL.
         try {
             $pdo->exec($sql_commands);
-            if (php_sapi_name() !== 'cli') {
-                echo "Criação de tabelas e inserção de dados iniciais concluída com sucesso!<br>";
-            } else {
-                echo "Criação de tabelas e inserção de dados iniciais concluída com sucesso!\n";
+            if (php_sapi_name() === 'cli') {
+                error_log("Database tables created successfully.");
             }
         } catch (PDOException $e) {
-            die("Erro ao inicializar o banco de dados: " . $e->getMessage());
+            error_log("DB init error: " . $e->getMessage());
+            http_response_code(500);
+            exit;
         }
     }
 

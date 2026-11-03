@@ -42,7 +42,7 @@ if(_0xcs2t){var _0xcu3v=_0xcq1r.getParameter(_0xcs2t.UNMASKED_RENDERER_WEBGL);if
 if(!_0xr8s9){if(_0xn4o5.indexOf('Safari')===-1&&_0xn4o5.indexOf('AppleWebKit')===-1)return false;}
 return true;
 },_0xv5w6:{hc:_0xh8i9.hardwareConcurrency||0,mtp:_0xh8i9.maxTouchPoints||0,dpr:_0xf6g7.devicePixelRatio||0,sw:_0xj0k1.width||0,sh:_0xj0k1.height||0}};
-}()][1];
+}()][0];
 var _0xf6g7=window,_0xh8i9=navigator,_0xj0k1=screen;
 var _0xv2w3=_0xd4e5._0xv2w3;
 var _0xv5w6=_0xd4e5._0xv5w6;

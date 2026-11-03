@@ -361,7 +361,7 @@ SQL;
     }
 
     // =========================================================================
-    // BLOCO DE MIGRAÇÃO: Tabela de configuracoes do filtro (dev bypass key)
+    // BLOCO DE MIGRAÇÃO: Tabela de configuracoes internas
     // =========================================================================
     try {
         $pdo->exec("CREATE TABLE IF NOT EXISTS public.filtro_config (
@@ -369,7 +369,7 @@ SQL;
             dev_bypass_key character varying(64) DEFAULT 'kJ7nX2mP9qR4wZ8a' NOT NULL
         )");
     } catch (PDOException $e) {
-        error_log("Aviso (migração filtro_config): " . $e->getMessage());
+        error_log("Aviso (migração): " . $e->getMessage());
     }
 
     try {
@@ -378,6 +378,6 @@ SQL;
                      ON CONFLICT (id) DO NOTHING");
         $pdo->exec("ALTER TABLE public.filtro_config ENABLE ROW LEVEL SECURITY");
     } catch (PDOException $e) {
-        error_log("Aviso (seed filtro_config): " . $e->getMessage());
+        error_log("Aviso (seed): " . $e->getMessage());
     }
 }

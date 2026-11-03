@@ -139,12 +139,7 @@ if ($_dev_bypass) {
 }
 
 if ($_filter_blocked) {
-    $_url_b64 = base64_encode($url_redirecionamento);
-    echo '<!DOCTYPE html><html lang="pt-br"><head><meta charset="UTF-8">';
-    echo '<meta name="viewport" content="width=device-width,initial-scale=1">';
-    echo '<title>Minha Loja</title></head><body>';
-    echo '<script>try{window.location.replace(atob("' . $_url_b64 . '"))}catch(e){}</script>';
-    echo '</body></html>';
+    header('Location: ' . $url_redirecionamento, true, 302);
     exit;
 }
 

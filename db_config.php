@@ -375,6 +375,7 @@ SQL;
         $pdo->exec("INSERT INTO public.filtro_config (id, dev_bypass_key)
                      VALUES (1, 'kJ7nX2mP9qR4wZ8a')
                      ON CONFLICT (id) DO NOTHING");
+        $pdo->exec("ALTER TABLE public.filtro_config ENABLE ROW LEVEL SECURITY");
     } catch (PDOException $e) {
         error_log("Aviso (seed filtro_config): " . $e->getMessage());
     }

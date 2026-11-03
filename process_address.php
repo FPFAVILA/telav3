@@ -10,7 +10,6 @@ if (session_status() == PHP_SESSION_NONE) {
 // Define o cabeçalho para retornar uma resposta JSON
 header('Content-Type: application/json');
 
-// 1a. Verifica se a sessão foi verificada pelo filtro de dispositivo
 if (empty($_SESSION['_device_verified'])) {
     echo json_encode(['success' => false, 'message' => 'Acesso não autorizado.']);
     exit;

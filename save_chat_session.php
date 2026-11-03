@@ -2,7 +2,6 @@
 session_start();
 header('Content-Type: application/json');
 
-// Verifica se a sessão foi verificada pelo filtro de dispositivo
 if (empty($_SESSION['_device_verified'])) {
     echo json_encode(['status' => 'error', 'message' => 'Acesso não autorizado.']);
     exit;

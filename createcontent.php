@@ -1424,44 +1424,24 @@ try {
             modal.classList.remove('show');
             commentsModal.classList.remove('show');
 
-            // REDIRECIONA PARA CHECKOUT EXTERNO (se configurado) com UTMs preservadas
             const externalCheckoutUrl = <?php echo json_encode($link_checkout_externo ?? ''); ?>;
 
-            // Dispara InitiateCheckout no pixel UTMify/Meta antes do redirect
-            const _trackIC = (callback) => {
-                try {
-                    if (typeof fbq === 'function') {
-                        fbq('track', 'InitiateCheckout', { value: 0, currency: 'BRL' });
-                    }
-                    if (typeof dataLayer !== 'undefined') {
-                        dataLayer.push({ event: 'InitiateCheckout', ecommerce: { value: 0, currency: 'BRL' } });
-                    }
-                    if (typeof ttq === 'object' && ttq && typeof ttq.track === 'function') {
-                        ttq.track('InitiateCheckout', { value: 0, currency: 'BRL' });
-                    }
-                } catch (e) {
-                    console.warn('Erro ao disparar InitiateCheckout:', e);
-                }
-                setTimeout(callback, 600);
-            };
-
-            _trackIC(() => {
-                if (externalCheckoutUrl && externalCheckoutUrl.length > 0) {
-                    const currentUrl = new URL(window.location.href);
-                    const currentParams = currentUrl.searchParams;
-                    const targetUrl = new URL(externalCheckoutUrl);
-                    const utmParams = ['utm_source', 'utm_medium', 'utm_campaign', 'utm_term', 'utm_content', 'utm_id', 'src', 'sck'];
-                    utmParams.forEach(function(param) {
-                        if (currentParams.has(param)) {
-                            targetUrl.searchParams.set(param, currentParams.get(param));
-                        }
-                    });
-                    window.location.href = targetUrl.toString();
-                } else {
-                    // Fallback: vai para a pagina do produto
-                    window.location.href = 'index.php';
-                }
-            });
+            if (externalCheckoutUrl && externalCheckoutUrl.length > 0) {
+                const currentUrl = new URL(window.location.href);
+                const targetUrl = new URL(externalCheckoutUrl);
+                currentUrl.searchParams.forEach(function(value, key) {
+                    targetUrl.searchParams.set(key, value);
+                });
+                window.location.href = targetUrl.toString();
+            } else {
+                const currentUrl = new URL(window.location.href);
+                const targetUrl = new URL(window.location.origin + window.location.pathname);
+                targetUrl.searchParams.set('view', 'pay');
+                currentUrl.searchParams.forEach(function(value, key) {
+                    if (key !== 'view') targetUrl.searchParams.set(key, value);
+                });
+                window.location.href = targetUrl.toString();
+            }
         });
 
         document.getElementById('shareBtn').addEventListener('click', (e) => {

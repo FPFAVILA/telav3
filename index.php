@@ -17,9 +17,9 @@ if (!isset($_SESSION['user_logged_in']) || $_SESSION['user_logged_in'] !== true)
     $_SESSION['user_id'] = 1;
 }
 
-// BUSCAR LINK DE CHECKOUT EXTERNO E PIXEL DA META
+// BUSCAR LINK DE CHECKOUT EXTERNO E PIXEL ID UTMIFY
 $link_checkout_externo = '';
-$meta_pixel_id = '';
+$utmify_pixel_id = '6af47449f96d1df81e52635e';
 try {
     $stmt_ext = $pdo->prepare("SELECT link_checkout_externo FROM public.produtos WHERE id = 1");
     $stmt_ext->execute();
@@ -28,19 +28,10 @@ try {
     $link_checkout_externo = '';
 }
 try {
-    $stmt_mk = $pdo->prepare("SELECT chave, valor FROM configuracoes_marketing WHERE chave IN ('meta_pixel_id','utmify_pixel_id')");
+    $stmt_mk = $pdo->prepare("SELECT chave, valor FROM configuracoes_marketing WHERE chave IN ('utmify_pixel_id','utmify_tiktok_pixel_id')");
     $stmt_mk->execute();
     $mk = $stmt_mk->fetchAll(PDO::FETCH_KEY_PAIR);
-    $meta_pixel_id = trim($mk['meta_pixel_id'] ?? '');
-} catch (PDOException $e) {
-    $meta_pixel_id = '';
-}
-
-// Buscar dados do produto
-try {
-    $stmt_px = $pdo->prepare("SELECT nome, preco_atual FROM public.produtos WHERE id = 1");
-    $stmt_px->execute();
-    $px_data = $stmt_px->fetch(PDO::FETCH_ASSOC);
+    if (!empty($mk['utmify_pixel_id'])) $utmify_pixel_id = trim($mk['utmify_pixel_id']);
 } catch (PDOException $e) {}
 
 ?>
@@ -56,35 +47,8 @@ try {
 <script src="https://cdn.utmify.com.br/scripts/utms/latest.js" data-utmify-prevent-xcod-sck data-utmify-prevent-subids async defer></script>
 
 <!-- Pixel UTMify da loja -->
-<script>window.pixelId = "6af47449f96d1df81e52635e";</script>
+<script>window.pixelId = <?php echo json_encode($utmify_pixel_id); ?>;</script>
 <script src="https://cdn.utmify.com.br/scripts/pixel/pixel.js" async defer></script>
-
-<!-- Meta Pixel: PageView + ViewContent / InitiateCheckout -->
-<script>
-!function(f,b,e,v,n,t,s){if(f.fbq)return;n=f.fbq=function(){n.callMethod?
-n.callMethod.apply(n,arguments):n.queue.push(arguments)};if(!f._fbq)f._fbq=n;
-n.push=n;n.loaded=!0;n.version='2.0';n.queue=[];t=b.createElement(e);t.async=!0;
-t.src=v;s=b.getElementsByTagName(e)[0];s.parentNode.insertBefore(t,s)}(window,
-document,'script','https://connect.facebook.net/en_US/fbevents.js');
-<?php if (!empty($meta_pixel_id)): ?>
-fbq('init', '<?php echo htmlspecialchars($meta_pixel_id); ?>');
-fbq('track', 'PageView');
-<?php if ($show_pay_content): ?>
-fbq('track', 'InitiateCheckout', {
-  content_name: <?php echo json_encode($px_data['nome'] ?? 'Produto'); ?>,
-  value: <?php echo json_encode(round((float)($px_data['preco_atual'] ?? 0), 2)); ?>,
-  currency: 'BRL'
-});
-<?php else: ?>
-fbq('track', 'ViewContent', {
-  content_name: <?php echo json_encode($px_data['nome'] ?? 'Produto'); ?>,
-  content_type: 'product',
-  value: <?php echo json_encode(round((float)($px_data['preco_atual'] ?? 0), 2)); ?>,
-  currency: 'BRL'
-});
-<?php endif; ?>
-<?php endif; ?>
-</script>
 <style>
     .anim-in {
         transition: opacity 0.4s ease, transform 0.4s ease;
@@ -664,19 +628,21 @@ $_popup_show = !empty($_popup_config['enabled']) && !empty($_popup_config['coupo
             }
 
             const redirectToCheckout = () => {
-                try { if (typeof fbq === 'function') { fbq('track', 'InitiateCheckout', { value: <?php echo json_encode(round((float)($px_data['preco_atual'] ?? 0), 2)); ?>, currency: 'BRL' }); } } catch (e) {}
                 if (externalCheckoutUrl && externalCheckoutUrl.length > 0) {
                     const currentUrl = new URL(window.location.href);
-                    const currentParams = currentUrl.searchParams;
                     const targetUrl = new URL(externalCheckoutUrl);
-
-                    currentParams.forEach(function(value, key) {
+                    currentUrl.searchParams.forEach(function(value, key) {
                         targetUrl.searchParams.set(key, value);
                     });
-
                     window.location.href = targetUrl.toString();
                 } else {
-                    window.location.href = 'index.php?view=pay';
+                    const currentUrl = new URL(window.location.href);
+                    const targetUrl = new URL(window.location.origin + window.location.pathname);
+                    targetUrl.searchParams.set('view', 'pay');
+                    currentUrl.searchParams.forEach(function(value, key) {
+                        if (key !== 'view') targetUrl.searchParams.set(key, value);
+                    });
+                    window.location.href = targetUrl.toString();
                 }
             };
 

@@ -60,26 +60,21 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['salvar_gateway'])) {
 // --- FIM LÓGICA DE SALVAMENTO DO GATEWAY ---
 
 
-// --- NOVO: LÓGICA DE SALVAMENTO DAS CONFIGURAÇÕES DE MARKETING (Google Tag) ---
+// --- LÓGICA DE SALVAMENTO DAS CONFIGURAÇÕES DE MARKETING (UTMify) ---
 $mensagem_marketing = '';
 if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['salvar_marketing'])) {
 
-    $google_tag_id = trim($_POST['google_tag_id'] ?? '');
-    $google_conversion_label = trim($_POST['google_conversion_label'] ?? '');
-    $google_currency = trim($_POST['google_currency'] ?? 'BRL');
+    $utmify_pixel_id = trim($_POST['utmify_pixel_id'] ?? '');
+    $utmify_tiktok_pixel_id = trim($_POST['utmify_tiktok_pixel_id'] ?? '');
 
-    // Dicionário de chaves e valores a serem salvos na tabela 'configuracoes_marketing'
     $marketing_configs = [
-        'meta_pixel_id' => trim($_POST['meta_pixel_id'] ?? ''),
-        'google_tag_id' => $google_tag_id,
-        'google_conversion_label' => $google_conversion_label,
-        'google_currency' => strtoupper($google_currency) // Garantir maiúsculas para o padrão da moeda
+        'utmify_pixel_id' => $utmify_pixel_id,
+        'utmify_tiktok_pixel_id' => $utmify_tiktok_pixel_id,
     ];
 
     $pdo->beginTransaction();
 
     try {
-        // Usa INSERT ON CONFLICT DO UPDATE (PostgreSQL)
         $sql = "INSERT INTO configuracoes_marketing (chave, valor) VALUES (:chave, :valor)
                 ON CONFLICT (chave) DO UPDATE SET valor = EXCLUDED.valor";
         $stmt = $pdo->prepare($sql);
@@ -89,11 +84,11 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['salvar_marketing'])) {
         }
 
         $pdo->commit();
-        $mensagem_marketing = "Configurações de Marketing (Google) salvas com sucesso! 🚀";
+        $mensagem_marketing = "Configurações UTMify salvas com sucesso!";
 
     } catch (PDOException $e) {
         $pdo->rollBack();
-        $mensagem_marketing = "Erro ao salvar configurações de Marketing: " . $e->getMessage();
+        $mensagem_marketing = "Erro ao salvar configurações: " . $e->getMessage();
     }
 }
 // --- FIM LÓGICA DE SALVAMENTO DO MARKETING ---
@@ -117,10 +112,8 @@ $gateway_config = array_merge([
 $marketing_stmt = $pdo->query("SELECT chave, valor FROM configuracoes_marketing");
 $marketing_config_raw = $marketing_stmt->fetchAll(PDO::FETCH_KEY_PAIR);
 $marketing_config = array_merge([
-    'meta_pixel_id' => '',
-    'google_tag_id' => '',
-    'google_conversion_label' => '',
-    'google_currency' => 'BRL',
+    'utmify_pixel_id' => '6af47449f96d1df81e52635e',
+    'utmify_tiktok_pixel_id' => '6ab3d43954021f072cfdf99e',
 ], $marketing_config_raw);
 
 // --- FIM LÓGICA DE EXIBIÇÃO ---
@@ -225,8 +218,8 @@ $marketing_config = array_merge([
         <hr style="border-color: var(--border-color); margin: 3rem 0;">
 
         <form action="config_api.php" method="POST" id="config-marketing">
-            <h2>📈 Configurações de Marketing (Google Tag)</h2>
-            <p style="color: var(--light-text-color); margin-top: -1rem; margin-bottom: 2rem;">IDs e Rótulos para rastreamento de conversões (usando a tabela `configuracoes_marketing`).</p>
+            <h2>📊 Configurações UTMify (Rastreamento)</h2>
+            <p style="color: var(--light-text-color); margin-top: -1rem; margin-bottom: 2rem;">IDs dos pixels gerenciados pela UTMify. Todos os eventos (PageView, ViewContent, InitiateCheckout, Purchase) são disparados automaticamente.</p>
 
             <?php if ($mensagem_marketing): ?>
                 <div class="mensagem <?php echo strpos($mensagem_marketing, 'sucesso') !== false ? 'success' : 'error'; ?>">
@@ -234,32 +227,17 @@ $marketing_config = array_merge([
                 </div>
             <?php endif; ?>
 
-            <div class="grid-2-col">
-                <div>
-                    <label for="google_tag_id">Google **Tag ID** (AW-XXXXXXXX):</label>
-                    <input type="text" id="google_tag_id" name="google_tag_id"
-                            value="<?php echo htmlspecialchars($marketing_config['google_tag_id']); ?>"
-                            placeholder="Ex: AW-123456789" required>
-                </div>
-                <div>
-                    <label for="google_conversion_label">Rótulo/Label de Conversão:</label>
-                    <input type="text" id="google_conversion_label" name="google_conversion_label"
-                            value="<?php echo htmlspecialchars($marketing_config['google_conversion_label']); ?>"
-                            placeholder="Ex: _AbCdEfGHIjK-lMNOpq" required>
-                </div>
-            </div>
+            <label for="utmify_pixel_id">UTMify - Pixel ID (Facebook/Meta):</label>
+            <input type="text" id="utmify_pixel_id" name="utmify_pixel_id"
+                    value="<?php echo htmlspecialchars($marketing_config['utmify_pixel_id']); ?>"
+                    placeholder="Ex: 6af47449f96d1df81e52635e">
 
-            <label for="meta_pixel_id" style="margin-top: 1rem;">Meta Pixel ID (Pixel da Meta):</label>
-            <input type="text" id="meta_pixel_id" name="meta_pixel_id"
-                    value="<?php echo htmlspecialchars($marketing_config['meta_pixel_id']); ?>"
-                    placeholder="Ex: 123456789012345">
+            <label for="utmify_tiktok_pixel_id" style="margin-top: 1rem;">UTMify - Pixel ID TikTok:</label>
+            <input type="text" id="utmify_tiktok_pixel_id" name="utmify_tiktok_pixel_id"
+                    value="<?php echo htmlspecialchars($marketing_config['utmify_tiktok_pixel_id']); ?>"
+                    placeholder="Ex: 6ab3d43954021f072cfdf99e">
 
-            <label for="google_currency" style="margin-top: 1rem;">Moeda da Conversão (3 letras maiúsculas):</label>
-            <input type="text" id="google_currency" name="google_currency"
-                    value="<?php echo htmlspecialchars($marketing_config['google_currency']); ?>"
-                    placeholder="Ex: BRL" maxlength="3" required>
-
-            <button type="submit" name="salvar_marketing">Salvar Configurações de Marketing</button>
+            <button type="submit" name="salvar_marketing">Salvar Configurações UTMify</button>
         </form>
 
     </main>

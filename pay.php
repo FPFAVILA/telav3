@@ -1068,8 +1068,13 @@ $pix_payment_id = 1;
                     // 3. FECHA o modal do PIX (por segurança)
                     pixModalOverlay.classList.remove('active');
 
-                    // 4. REDIRECIONA para a página thanks.php com o ID do pedido
-                    window.location.href = 'thanks.php?pedido_id=' + pedidoId; // <-- MUDANÇA CRÍTICA
+                    // 4. REDIRECIONA para a página thanks.php com o ID do pedido + UTMs preservadas
+                    const thanksUrl = new URL(window.location.origin + window.location.pathname.replace(/\/[^\/]*$/, '/thanks.php'));
+                    thanksUrl.searchParams.set('pedido_id', pedidoId);
+                    new URL(window.location.href).searchParams.forEach(function(value, key) {
+                        if (key !== 'pedido_id') thanksUrl.searchParams.set(key, value);
+                    });
+                    window.location.href = thanksUrl.toString();
 
                 } else if (result.status === 'PENDENTE') {
                     // Continua...

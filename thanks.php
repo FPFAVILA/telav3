@@ -66,30 +66,7 @@ try {
 
 
 // =========================================================================
-// 4. NOVO BLOCO: BUSCA DAS CONFIGURAÇÕES DE MARKETING DO DB
-// =========================================================================
-$configuracoes = [];
-try {
-    // Busca todas as configurações de marketing (PDO::FETCH_KEY_PAIR é ideal aqui)
-    $stmt_config = $pdo->query("SELECT chave, valor FROM configuracoes_marketing");
-    $resultados = $stmt_config->fetchAll(PDO::FETCH_KEY_PAIR);
-
-    // Armazena no array de configurações. Ex: $configuracoes['google_tag_id']
-    $configuracoes = $resultados;
-
-} catch (PDOException $e) {
-    // Se o DB estiver inacessível ou a tabela não existir, usamos valores vazios para evitar erro fatal
-    error_log("Erro ao buscar configurações de marketing: " . $e->getMessage());
-    $configuracoes = [
-        'google_tag_id' => '',
-        'google_conversion_label' => '',
-        'google_currency' => 'BRL'
-    ];
-}
-
-
-// =========================================================================
-// 5. PREPARAÇÃO FINAL DOS DADOS PARA EXIBIÇÃO E TAG DO GOOGLE
+// 4. PREPARAÇÃO FINAL DOS DADOS PARA EXIBIÇÃO
 // =========================================================================
 $total_brl = number_format($pedido['total_amount_centavos'] / 100, 2, ',', '.');
 $data_pedido = date('d/m/Y H:i', strtotime($pedido['created_at']));
@@ -100,17 +77,16 @@ $product_name_full = htmlspecialchars($pedido['product_name']);
 $product_quantity = $pedido['quantity'];
 $tracking_code = generateFictionalTrackingCode();
 
-// Variáveis essenciais para a Tag do Google:
-// Valor: DEVE ser float/decimal, usando PONTO como separador decimal.
-$valor_transacao_google = number_format($pedido['total_amount_centavos'] / 100, 2, '.', '');
-$id_transacao_google = htmlspecialchars($pedido['id']); // Usa o ID do pedido
-$moeda_google = $configuracoes['google_currency'] ?? 'BRL'; // Valor do DB
-$tag_id = $configuracoes['google_tag_id'] ?? ''; // Valor do DB
-$conversion_label = $configuracoes['google_conversion_label'] ?? ''; // Valor do DB
-$meta_pixel_id = $configuracoes['meta_pixel_id'] ?? ''; // Pixel da Meta
-
-// Monta o send_to completo (ex: AW-12345/abcde)
-$send_to = !empty($tag_id) && !empty($conversion_label) ? $tag_id . '/' . $conversion_label : '';
+// Buscar pixel IDs da UTMify no banco
+$utmify_pixel_id = '6af47449f96d1df81e52635e';
+$utmify_tiktok_pixel_id = '6ab3d43954021f072cfdf99e';
+try {
+    $stmt_mk = $pdo->prepare("SELECT chave, valor FROM configuracoes_marketing WHERE chave IN ('utmify_pixel_id','utmify_tiktok_pixel_id')");
+    $stmt_mk->execute();
+    $mk = $stmt_mk->fetchAll(PDO::FETCH_KEY_PAIR);
+    if (!empty($mk['utmify_pixel_id'])) $utmify_pixel_id = trim($mk['utmify_pixel_id']);
+    if (!empty($mk['utmify_tiktok_pixel_id'])) $utmify_tiktok_pixel_id = trim($mk['utmify_tiktok_pixel_id']);
+} catch (PDOException $e) {}
 ?>
 <!DOCTYPE html>
 <html lang="pt-BR">
@@ -119,51 +95,16 @@ $send_to = !empty($tag_id) && !empty($conversion_label) ? $tag_id . '/' . $conve
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Obrigado! Pedido #<?php echo htmlspecialchars($pedido['id']); ?></title>
 
-        <!-- UTMify: captura de parametros de campanha -->
+    <!-- UTMify: captura de parametros de campanha -->
     <script src="https://cdn.utmify.com.br/scripts/utms/latest.js" data-utmify-prevent-xcod-sck data-utmify-prevent-subids async defer></script>
 
-    <!-- Pixel UTMify da pagina de obrigado -->
-    <script>window.tikTokPixelId = "6ab3d43954021f072cfdf99e";</script>
+    <!-- Pixel UTMify Facebook (pagina de obrigado) -->
+    <script>window.pixelId = <?php echo json_encode($utmify_pixel_id); ?>;</script>
+    <script src="https://cdn.utmify.com.br/scripts/pixel/pixel.js" async defer></script>
+
+    <!-- Pixel UTMify TikTok (pagina de obrigado) -->
+    <script>window.tikTokPixelId = <?php echo json_encode($utmify_tiktok_pixel_id); ?>;</script>
     <script src="https://cdn.utmify.com.br/scripts/pixel/pixel-tiktok.js" async defer></script>
-
-    <!-- Meta Pixel: Purchase -->
-    <script>
-    !function(f,b,e,v,n,t,s){if(f.fbq)return;n=f.fbq=function(){n.callMethod?
-    n.callMethod.apply(n,arguments):n.queue.push(arguments)};if(!f._fbq)f._fbq=n;
-    n.push=n;n.loaded=!0;n.version='2.0';n.queue=[];t=b.createElement(e);t.async=!0;
-    t.src=v;s=b.getElementsByTagName(e)[0];s.parentNode.insertBefore(t,s)}(window,
-    document,'script','https://connect.facebook.net/en_US/fbevents.js');
-    <?php if (!empty($meta_pixel_id)): ?>
-    fbq('init', '<?php echo htmlspecialchars($meta_pixel_id); ?>');
-    fbq('track', 'Purchase', {
-      value: <?php echo $valor_transacao_google; ?>,
-      currency: '<?php echo htmlspecialchars($moeda_google); ?>',
-      content_name: <?php echo json_encode($product_name_full); ?>,
-      transaction_id: '<?php echo $id_transacao_google; ?>'
-    });
-    <?php endif; ?>
-    </script>
-
-    <?php if (!empty($tag_id) && !empty($send_to)) : ?>
-
-        <script async src="https://www.googletagmanager.com/gtag/js?id=<?php echo $tag_id; ?>"></script>
-        <script>
-          window.dataLayer = window.dataLayer || [];
-          function gtag(){dataLayer.push(arguments);}
-          gtag('js', new Date());
-          gtag('config', '<?php echo $tag_id; ?>');
-        </script>
-
-        <script>
-          gtag('event', 'conversion', {
-            'send_to': '<?php echo $send_to; ?>',
-            'value': <?php echo $valor_transacao_google; ?>,
-            'currency': '<?php echo $moeda_google; ?>',
-            'transaction_id': '<?php echo $id_transacao_google; ?>',
-          });
-        </script>
-
-    <?php endif; ?>
 
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap">
     <style>

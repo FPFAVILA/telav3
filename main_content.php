@@ -50,6 +50,7 @@ try {
 
     // CORREÇÃO: Usamos o nome vindo do DB como título
     $titulo_produto = htmlspecialchars($produto['nome'] ?? 'Polo Masculina...');
+    $nome_produto = $produto['nome'] ?? 'Produto';
 
     // Preços
     $preco_atual = floatval($produto['preco_atual'] ?? 0);
@@ -90,12 +91,12 @@ try {
     $rating = '4.7'; $rating_count = '31'; $sold_count = '2873';
     $tag_campanha = "Black Friday";
     $titulo_produto = "Produto de Exemplo com Título Longo...";
-    $imagens = ['placeholder.jpg'];
+    $imagens = ['https://images.pexels.com/photos/7862645/pexels-photo-7862645.jpeg?auto=compress&cs=tinysrgb&h=900&w=900'];
     $nome_produto = 'Erro ao carregar produto';
 }
 
 if (empty($imagens)) {
-    $imagens[] = 'placeholder.jpg';
+    $imagens[] = 'https://images.pexels.com/photos/7862645/pexels-photo-7862645.jpeg?auto=compress&cs=tinysrgb&h=900&w=900';
 }
 
 $total_imagens = count($imagens);
@@ -1316,7 +1317,7 @@ body {
         <button class="variant-modal-close" id="variantModalClose" type="button">&times;</button>
 
         <div class="variant-modal-product">
-            <img id="variantModalImg" src="<?php echo htmlspecialchars(!empty($imagens[0]) ? trim($imagens[0]) : 'placeholder.jpg'); ?>" alt="Produto">
+            <img id="variantModalImg" src="<?php echo htmlspecialchars(!empty($imagens[0]) ? trim($imagens[0]) : 'https://images.pexels.com/photos/7862645/pexels-photo-7862645.jpeg?auto=compress&cs=tinysrgb&h=900&w=900'); ?>" alt="Produto">
             <div class="variant-modal-product-info">
                 <div class="variant-modal-price">
                     <span class="vmp-current">R$ <?php echo number_format($preco_atual, 2, ',', '.'); ?></span>

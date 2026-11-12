@@ -47,7 +47,7 @@ try {
         'rating' => 5.0,
         'preco_atual' => 434.90, // Subtotal
         'preco_antigo' => 549.90, // Preço Original
-        'imagem_principal' => 'https://via.placeholder.com/80x80?text=PROD',
+        'imagem_principal' => 'https://images.pexels.com/photos/7862645/pexels-photo-7862645.jpeg?auto=compress&cs=tinysrgb&h=300&w=300',
     ];
 }
 
@@ -462,7 +462,7 @@ $pix_payment_id = 1;
         </div>
         <div class="produto-card">
             <div>
-                <img src="<?php echo htmlspecialchars($produto_checkout['imagem_principal'] ?? 'https://via.placeholder.com/80x80?text=PROD'); ?>" alt="Imagem do Produto" class="produto-imagem">
+                <img src="<?php echo htmlspecialchars($produto_checkout['imagem_principal'] ?? 'https://images.pexels.com/photos/7862645/pexels-photo-7862645.jpeg?auto=compress&cs=tinysrgb&h=300&w=300'); ?>" alt="Imagem do Produto" class="produto-imagem">
             </div>
             <div class="produto-detalhes">
                 <div>

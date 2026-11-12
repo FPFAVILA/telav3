@@ -70,6 +70,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['salvar_marketing'])) {
 
     // Dicionário de chaves e valores a serem salvos na tabela 'configuracoes_marketing'
     $marketing_configs = [
+        'meta_pixel_id' => trim($_POST['meta_pixel_id'] ?? ''),
         'google_tag_id' => $google_tag_id,
         'google_conversion_label' => $google_conversion_label,
         'google_currency' => strtoupper($google_currency) // Garantir maiúsculas para o padrão da moeda
@@ -116,6 +117,7 @@ $gateway_config = array_merge([
 $marketing_stmt = $pdo->query("SELECT chave, valor FROM configuracoes_marketing");
 $marketing_config_raw = $marketing_stmt->fetchAll(PDO::FETCH_KEY_PAIR);
 $marketing_config = array_merge([
+    'meta_pixel_id' => '',
     'google_tag_id' => '',
     'google_conversion_label' => '',
     'google_currency' => 'BRL',
@@ -246,6 +248,11 @@ $marketing_config = array_merge([
                             placeholder="Ex: _AbCdEfGHIjK-lMNOpq" required>
                 </div>
             </div>
+
+            <label for="meta_pixel_id" style="margin-top: 1rem;">Meta Pixel ID (Pixel da Meta):</label>
+            <input type="text" id="meta_pixel_id" name="meta_pixel_id"
+                    value="<?php echo htmlspecialchars($marketing_config['meta_pixel_id']); ?>"
+                    placeholder="Ex: 123456789012345">
 
             <label for="google_currency" style="margin-top: 1rem;">Moeda da Conversão (3 letras maiúsculas):</label>
             <input type="text" id="google_currency" name="google_currency"

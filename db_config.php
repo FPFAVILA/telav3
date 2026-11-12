@@ -216,10 +216,10 @@ INSERT INTO public.produtos (
     'Cadeira Gamer Fox Office Fox Racer, RGB e Iluminação LED, até 130kgs, com almofadas, Reclinável - Preta e Branca',
     99.90,
     199.90,
-    'url_default_produto.png',
+    'https://images.pexels.com/photos/7862645/pexels-photo-7862645.jpeg?auto=compress&cs=tinysrgb&h=900&w=900',
     4.8,
     'EAGLE FORCE BR',
-    'url_default_logo.jpeg'
+    'https://i.pravatar.cc/100?img=12'
 ) ON CONFLICT (id) DO NOTHING;
 
 -- Garante que o próximo ID da tabela produtos seja 2 (depois de inserir o 1)
@@ -264,6 +264,15 @@ SQL;
         $pdo->exec("ALTER TABLE public.produtos ADD COLUMN IF NOT EXISTS review_photos text[]");
     } catch (PDOException $e) {
         error_log("Aviso (migração review_photos): " . $e->getMessage());
+    }
+
+    // Migração: trocar imagens placeholder quebradas por imagens reais
+    try {
+        $pdo->exec("UPDATE public.produtos SET imagem_principal = 'https://images.pexels.com/photos/7862645/pexels-photo-7862645.jpeg?auto=compress&cs=tinysrgb&h=900&w=900' WHERE imagem_principal IN ('url_default_produto.png', 'placeholder.jpg', '') OR imagem_principal IS NULL");
+        $pdo->exec("UPDATE public.produtos SET url_logo_vendedor = 'https://i.pravatar.cc/100?img=12' WHERE url_logo_vendedor LIKE 'url_default_logo%' OR url_logo_vendedor = ''");
+        $pdo->exec("UPDATE public.produtos SET imagens_galeria = ARRAY['https://images.pexels.com/photos/31306007/pexels-photo-31306007.jpeg?auto=compress&cs=tinysrgb&h=900&w=900','https://images.pexels.com/photos/9072206/pexels-photo-9072206.jpeg?auto=compress&cs=tinysrgb&h=900&w=900','https://images.pexels.com/photos/32260117/pexels-photo-32260117.jpeg?auto=compress&cs=tinysrgb&h=900&w=900']::text[] WHERE imagens_galeria IS NULL OR array_length(imagens_galeria, 1) IS NULL");
+    } catch (PDOException $e) {
+        error_log("Aviso (migração imagens): " . $e->getMessage());
     }
 
     // =========================================================================

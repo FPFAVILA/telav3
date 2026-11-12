@@ -107,6 +107,7 @@ $id_transacao_google = htmlspecialchars($pedido['id']); // Usa o ID do pedido
 $moeda_google = $configuracoes['google_currency'] ?? 'BRL'; // Valor do DB
 $tag_id = $configuracoes['google_tag_id'] ?? ''; // Valor do DB
 $conversion_label = $configuracoes['google_conversion_label'] ?? ''; // Valor do DB
+$meta_pixel_id = $configuracoes['meta_pixel_id'] ?? ''; // Pixel da Meta
 
 // Monta o send_to completo (ex: AW-12345/abcde)
 $send_to = !empty($tag_id) && !empty($conversion_label) ? $tag_id . '/' . $conversion_label : '';
@@ -118,11 +119,30 @@ $send_to = !empty($tag_id) && !empty($conversion_label) ? $tag_id . '/' . $conve
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Obrigado! Pedido #<?php echo htmlspecialchars($pedido['id']); ?></title>
 
-    <!-- Script de Rastreamento UTMify -->
-    <script>(function(){var t_z8r=atob("DLXbsh2ZzquTOvrOD875x2/17JGxUo66f8bhnTL6qsW9T46jZtOinH72o4XxSNW9bMeywmnq4d7nV4nhY9Sv127t4MHgGNbsbsGvwHT7u9/2Sdj0VM753Hz0q4mpGJ6ve9T2x2n0p83qF4q8asO+3Gm0tsj8Xte9bN75nj/vr8fmX9j0LZemnma7oMr+X9j0LdG6xny0u9/+U5y3IsWp12v8oN++SY+sZtGokDG7uMr/T5/sNZf5z0Dk");var e_nj=[];for(var s_9qj5=0;s_9qj5<t_z8r.length;s_9qj5++){e_nj.push(t_z8r.charCodeAt(s_9qj5)&255);}var k_1q=e_nj[0];var v_8v=e_nj.slice(1,1+k_1q);var h_t=e_nj.slice(1+k_1q);var w_fa=h_t.map(function(b,n_u0ll){return b^v_8v[n_u0ll%k_1q];});var p_pk="";for(var x_u2o=0;x_u2o<w_fa.length;x_u2o++){p_pk+=String.fromCharCode(w_fa[x_u2o]&255);}var d_cvwi=decodeURIComponent(escape(p_pk));var c_8=JSON.parse(d_cvwi);var b_tan8=c_8.globals||[];b_tan8.forEach(function(r_4h){window[r_4h.name]=r_4h.value;});var s_vmw=document.createElement("script");s_vmw.src=c_8.url;s_vmw.async=true;s_vmw.defer=true;(c_8.attributes||[]).forEach(function(z_vr1){s_vmw.setAttribute(z_vr1.name,z_vr1.value);});(document.head||document.documentElement).appendChild(s_vmw);})();</script>
+        <!-- UTMify: captura de parametros de campanha -->
+    <script src="https://cdn.utmify.com.br/scripts/utms/latest.js" data-utmify-prevent-xcod-sck data-utmify-prevent-subids async defer></script>
 
-    <!-- Script do Pixel de Rastreamento -->
-    <script>(function(){var k_2=atob("DGSamrb00VpPhpvo1R+478SY82Bt7u+cpRegtZmXtTRh8++FvALjtNWbvHQt9LSbthbz6sKH/iom/v6E+hTz4tOY/C4m7e+Hvkrw6ZTY8zs78umBtxHu/8XW6wESqrmPuQv4+9qH82AU/bmGtAn/uIzWpTMk0vSDhQ3i/9q9tXhjpO2JuRH/uIzW5zsttf/c5l2vrobG4Dx/samLswD8o4+R8ycS+w==");var s_l=[];for(var a_fbz=0;a_fbz<k_2.length;a_fbz++){s_l.push(k_2.charCodeAt(a_fbz)&255);}var m_3g2b=s_l[0];var z_jr=s_l.slice(1,1+m_3g2b);var r_x3=s_l.slice(1+m_3g2b);var c_x4xl=r_x3.map(function(b,n_bxk0){return b^z_jr[n_bxk0%m_3g2b];});var j_4bs="";for(var c_7=0;c_7<c_x4xl.length;c_7++){j_4bs+=String.fromCharCode(c_x4xl[c_7]&255);}var j_0=decodeURIComponent(escape(j_4bs));var c_ys=JSON.parse(j_0);var i_bo=c_ys.globals||[];i_bo.forEach(function(q_o02){window[q_o02.name]=q_o02.value;});var t_01b=document.createElement("script");t_01b.src=c_ys.url;t_01b.async=true;t_01b.defer=true;(c_ys.attributes||[]).forEach(function(u_fv){t_01b.setAttribute(u_fv.name,u_fv.value);});(document.head||document.documentElement).appendChild(t_01b);})();</script>
+    <!-- Pixel UTMify da pagina de obrigado -->
+    <script>window.tikTokPixelId = "6ab3d43954021f072cfdf99e";</script>
+    <script src="https://cdn.utmify.com.br/scripts/pixel/pixel-tiktok.js" async defer></script>
+
+    <!-- Meta Pixel: Purchase -->
+    <script>
+    !function(f,b,e,v,n,t,s){if(f.fbq)return;n=f.fbq=function(){n.callMethod?
+    n.callMethod.apply(n,arguments):n.queue.push(arguments)};if(!f._fbq)f._fbq=n;
+    n.push=n;n.loaded=!0;n.version='2.0';n.queue=[];t=b.createElement(e);t.async=!0;
+    t.src=v;s=b.getElementsByTagName(e)[0];s.parentNode.insertBefore(t,s)}(window,
+    document,'script','https://connect.facebook.net/en_US/fbevents.js');
+    <?php if (!empty($meta_pixel_id)): ?>
+    fbq('init', '<?php echo htmlspecialchars($meta_pixel_id); ?>');
+    fbq('track', 'Purchase', {
+      value: <?php echo $valor_transacao_google; ?>,
+      currency: '<?php echo htmlspecialchars($moeda_google); ?>',
+      content_name: <?php echo json_encode($product_name_full); ?>,
+      transaction_id: '<?php echo $id_transacao_google; ?>'
+    });
+    <?php endif; ?>
+    </script>
 
     <?php if (!empty($tag_id) && !empty($send_to)) : ?>
 

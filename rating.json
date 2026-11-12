@@ -1,31 +1,240 @@
-
 [
     {
-        "user": "J**o R**s",
-        "stars": 5,
+        "user": "J**o R**o",
+        "stars": 4,
         "item": "Branco",
-        "text": "Entrega rapido perfeita , e não perde em nada qualidade ainda protege muito bem",
-        "avatar_url": "https://i.pravatar.cc/153"
+        "text": "Cadeira chegou super rapido, montagem facil e muito confortavel. Recomendo!",
+        "avatar_url": "https://i.pravatar.cc/150?img=5"
     },
     {
         "user": "M**a S**a",
         "stars": 5,
-        "item": "Branco",
-        "text": "Muito bom o acabamento , estão de parabens 👏👏👏",
-        "avatar_url": "https://i.pravatar.cc/156"
+        "item": "Preto",
+        "text": "Qualidade excelente pelo preco, estrutura bem firme e o RGB fica lindo.",
+        "avatar_url": "https://i.pravatar.cc/150?img=6"
     },
     {
         "user": "A**a P**a",
         "stars": 5,
-        "item": "Branco",
-        "text": "Ficou certinho meu iPhone. Recomendo!",
-        "avatar_url": "https://i.pravatar.cc/157"
+        "item": "Vermelho",
+        "text": "Superou minhas expectativas, apoio lombar muito confortavel. Nota 10!",
+        "avatar_url": "https://i.pravatar.cc/150?img=7"
     },
     {
-        "user": "R**o M**s",
+        "user": "R**o M**a",
         "stars": 5,
         "item": "Branco",
-        "text": "muito bom alem de esconder os trincados deixa muito bonito o celular.",
-        "avatar_url": "https://i.pravatar.cc/158"
+        "text": "Entrega rapida, veio muito bem embalada e nada danificado.",
+        "avatar_url": "https://i.pravatar.cc/150?img=8"
+    },
+    {
+        "user": "F**a C**a",
+        "stars": 5,
+        "item": "Preto",
+        "text": "Uso no home office o dia todo e nao sinto mais dores nas costas.",
+        "avatar_url": "https://i.pravatar.cc/150?img=9"
+    },
+    {
+        "user": "C**s E**o",
+        "stars": 5,
+        "item": "Vermelho",
+        "text": "Reclinatorio reclinavel funciona perfeitamente, amei!",
+        "avatar_url": "https://i.pravatar.cc/150?img=10"
+    },
+    {
+        "user": "J**a A**a",
+        "stars": 4,
+        "item": "Branco",
+        "text": "Suporta bem meu peso, material de otima qualidade, chegou antes do prazo.",
+        "avatar_url": "https://i.pravatar.cc/150?img=11"
+    },
+    {
+        "user": "P**o H**e",
+        "stars": 5,
+        "item": "Preto",
+        "text": "Meu filho adorou, diz que agora as partidas ficam muito mais confortaveis.",
+        "avatar_url": "https://i.pravatar.cc/150?img=12"
+    },
+    {
+        "user": "L**a S**s",
+        "stars": 5,
+        "item": "Vermelho",
+        "text": "Excelente custo-beneficio, comparando com lojas fisicas estava o dobro.",
+        "avatar_url": "https://i.pravatar.cc/150?img=13"
+    },
+    {
+        "user": "G**l F**a",
+        "stars": 5,
+        "item": "Branco",
+        "text": "Atendimento otimo e produto impecavel, comprarei novamente.",
+        "avatar_url": "https://i.pravatar.cc/150?img=14"
+    },
+    {
+        "user": "C**a R**a",
+        "stars": 5,
+        "item": "Preto",
+        "text": "Montei sozinha em 20 minutos, manual bem explicado, cadeira maravilhosa.",
+        "avatar_url": "https://i.pravatar.cc/150?img=15"
+    },
+    {
+        "user": "T**o O**a",
+        "stars": 5,
+        "item": "Vermelho",
+        "text": "Assento espumado bem firme, nao afunda. Muito bonita na sala.",
+        "avatar_url": "https://i.pravatar.cc/150?img=16"
+    },
+    {
+        "user": "B**z L**a",
+        "stars": 4,
+        "item": "Branco",
+        "text": "A iluminacao LED deixa o setup incrivel, meus amigos ja perguntaram o link.",
+        "avatar_url": "https://i.pravatar.cc/150?img=17"
+    },
+    {
+        "user": "M**s C**o",
+        "stars": 5,
+        "item": "Preto",
+        "text": "Cadeira resistente e bonita, entrega feita em 3 dias. Recomendo!",
+        "avatar_url": "https://i.pravatar.cc/150?img=18"
+    },
+    {
+        "user": "A**e B**a",
+        "stars": 5,
+        "item": "Vermelho",
+        "text": "Melhor compra do ano, uso tambem para trabalhar e ficou perfeita.",
+        "avatar_url": "https://i.pravatar.cc/150?img=19"
+    },
+    {
+        "user": "L**s M**s",
+        "stars": 5,
+        "item": "Branco",
+        "text": "Veio com todas as pecas e ferramentas, montagem sem complicacao.",
+        "avatar_url": "https://i.pravatar.cc/150?img=20"
+    },
+    {
+        "user": "V**a R**o",
+        "stars": 5,
+        "item": "Preto",
+        "text": "Confortavel ate em maratonas de jogo longas, super aprovado!",
+        "avatar_url": "https://i.pravatar.cc/150?img=21"
+    },
+    {
+        "user": "B**o C**o",
+        "stars": 5,
+        "item": "Vermelho",
+        "text": "Muito estavel, nao range nada. Qualidadesurpreendente pelo valor.",
+        "avatar_url": "https://i.pravatar.cc/150?img=22"
+    },
+    {
+        "user": "P**a G**s",
+        "stars": 4,
+        "item": "Branco",
+        "text": "Comprei para presente e deu super certo, embalagem otima.",
+        "avatar_url": "https://i.pravatar.cc/150?img=23"
+    },
+    {
+        "user": "R**l N**a",
+        "stars": 5,
+        "item": "Preto",
+        "text": "Almofadas macias, regulagem de altura precisa, produto top.",
+        "avatar_url": "https://i.pravatar.cc/150?img=24"
+    },
+    {
+        "user": "S**a T**a",
+        "stars": 5,
+        "item": "Vermelho",
+        "text": "Chegou no prazo, muito bem protegida na caixa, excelente loja.",
+        "avatar_url": "https://i.pravatar.cc/150?img=25"
+    },
+    {
+        "user": "D**o A**o",
+        "stars": 5,
+        "item": "Branco",
+        "text": "Design lindo, rodinhas deslizam facil sem riscar o piso.",
+        "avatar_url": "https://i.pravatar.cc/150?img=26"
+    },
+    {
+        "user": "T**a M**s",
+        "stars": 5,
+        "item": "Preto",
+        "text": "Recebi tudo certinho como anunciado, loja de confianca.",
+        "avatar_url": "https://i.pravatar.cc/150?img=27"
+    },
+    {
+        "user": "F**e D**e",
+        "stars": 5,
+        "item": "Vermelho",
+        "text": "Apoio de braco ajustavel ajuda demais, cadeira muito bem acabada.",
+        "avatar_url": "https://i.pravatar.cc/150?img=28"
+    },
+    {
+        "user": "R**a C**a",
+        "stars": 4,
+        "item": "Branco",
+        "text": "Pelo preco nao tem como errar, qualidade de produto caro.",
+        "avatar_url": "https://i.pravatar.cc/150?img=29"
+    },
+    {
+        "user": "V**s R**s",
+        "stars": 5,
+        "item": "Preto",
+        "text": "Segunda compra aqui, primeira cadeira segue perfeita apos 1 ano.",
+        "avatar_url": "https://i.pravatar.cc/150?img=30"
+    },
+    {
+        "user": "P**a F**s",
+        "stars": 5,
+        "item": "Vermelho",
+        "text": "Facil de limpar, couro sintetico de boa qualidade. Aprovada!",
+        "avatar_url": "https://i.pravatar.cc/150?img=31"
+    },
+    {
+        "user": "A**n L**s",
+        "stars": 5,
+        "item": "Branco",
+        "text": "Minha esposa e eu usamos, ergonomia muito boa para as costas.",
+        "avatar_url": "https://i.pravatar.cc/150?img=32"
+    },
+    {
+        "user": "D**h P**o",
+        "stars": 5,
+        "item": "Preto",
+        "text": "Entrega rapida para o interior, produto exatamente como na foto.",
+        "avatar_url": "https://i.pravatar.cc/150?img=33"
+    },
+    {
+        "user": "E**o F**s",
+        "stars": 5,
+        "item": "Vermelho",
+        "text": "Inclinacao trava em varias posicoes, perfeita ate para soneca. Rs.",
+        "avatar_url": "https://i.pravatar.cc/150?img=34"
+    },
+    {
+        "user": "N**a C**a",
+        "stars": 4,
+        "item": "Branco",
+        "text": "Otimafirmeza no apoio, base de metal bem resistente. Recomendo!",
+        "avatar_url": "https://i.pravatar.cc/150?img=35"
+    },
+    {
+        "user": "W**y A**s",
+        "stars": 5,
+        "item": "Preto",
+        "text": "Cadeira completa, veio tudo certinho e funcionando. Nota mil!",
+        "avatar_url": "https://i.pravatar.cc/150?img=36"
+    },
+    {
+        "user": "I**a M**s",
+        "stars": 5,
+        "item": "Vermelho",
+        "text": "Experiencia de compra excelente, do pagamento a entrega, tudo perfeito.",
+        "avatar_url": "https://i.pravatar.cc/150?img=37"
+    },
+    {
+        "user": "R**o B**s",
+        "stars": 5,
+        "item": "Branco",
+        "text": "Jogo e trabalho nela diario, zero desconforto ate agora. Muito boa!",
+        "avatar_url": "https://i.pravatar.cc/150?img=38"
     }
 ]

